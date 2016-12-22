@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>vue API</title>
+	<style>
+	[v-cloak] { display: none; }
+	input { border: 1px solid #eee; }
+	</style>
+</head>
+
+<body>
+	<div id='test' v-cloak>
+		<div v-test="{methods: hello, input_value: value}">
+			<input type="text" v-model=value>
+		</div>
+		<div v-test="{methods: hello2, input_value: value}">
+			<input type="text" v-model=value2>
+		</div>
+	</div>
+
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.1.6/vue.js"></script>
+	<script>
+		Vue.directive('test', {
+			bind: function(el, binding) { // el是绑定指令的元素
+				var value = binding.value; // 传递给指令的值
+				var input_value = value.input_value;
+				el.handler = function () { // This directive.handler
+		        	value.methods.call(this, value);
+		        };
+
+                el.getElementsByTagName('input')[0].addEventListener('blur', function () {
+                	checkout(el.getElementsByTagName('input')[0].value);
+				});
+
+				function checkout (value) {
+					var filter = /^1[358]\d{9}$/;
+					if (!filter.test(value)) {
+						el.handler()
+					}
+				}
+			}
+		})
+		var demo = new Vue({
+			el: '#test',
+			data: function() {
+				return {
+					value: '111',
+					value2: ''
+				}
+			},
+			methods: {
+				hello: function() {
+					// alert('触发外部fn')
+					console.log('手机号码格式不正确！')
+				},
+				hello2: function() {
+					// alert('触发外部fn')
+					console.log('2手机号码格式不正确！')
+				}
+			}
+		});
+	</script>
+</body>

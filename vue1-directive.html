@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>vue API</title>
+	<style>
+	[v-cloak] { display: none; }
+	input { border: 1px solid #eee; }
+	</style>
+</head>
+
+<body>
+	<div id='test' v-cloak>
+		<div v-test="hello" :input_value="value">
+			<input type="text" v-model=value>
+		</div>
+	</div>
+
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/vue/1.0.26/vue.js"></script>
+	<script>
+		Vue.directive('test', {
+			params: ['input_value'],
+			acceptStatement: true,
+			update: function(fn) {
+				var self = this;
+				if (typeof fn !== 'function') {
+                    return false
+                }
+				self.handler = function() {
+                    fn.call(self);
+                }
+
+                self.el.getElementsByTagName('input')[0].addEventListener('blur', function () {
+					self.checkout(self.params.input_value);
+				});
+			},
+			checkout: function(value) {
+				var filter = /^1[358]\d{9}$/;
+				if (!filter.test(value)) {
+					this.handler()
+				}
+			}
+		})
+		var demo = new Vue({
+			el: '#test',
+			data: function() {
+				return {
+					value: ''
+				}
+			},
+			methods: {
+				hello: function() {
+					// alert('触发外部fn')
+					console.log('手机号码格式不正确！')
+				}
+			}
+		});
+	</script>
+</body>
